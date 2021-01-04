@@ -3,12 +3,12 @@
 //! This is built to provide an inter-process mechanism to communicate
 //! between different parties.
 //!
-//! It allows a `Writer`(TODO: Link docs) send a message that can be read
-//! by multiple `Reader` s concurrently. The role of `Bondi` is to sync these operations,
+//! It allows a [Writer](writer::Writer) send a message that can be read
+//! by multiple [Reader](reader::Reader) s concurrently. The role of `Bondi` is to sync these operations,
 //! while keeping things **fast**.
-mod reader;
-mod ring;
-mod writer;
+pub mod reader;
+pub mod ring;
+pub mod writer;
 
 use ring::Ring;
 
