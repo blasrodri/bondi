@@ -49,7 +49,8 @@ impl<T: Clone> Ring<T> {
         while self.writer_idx.load(Ordering::SeqCst) == consumer_idx {
             // TODO: get rid of the wait. Ideally subscribe a thread park
             // that will be unparked whenever the write advances.
-            // but I'm not sure how to do it using lock-free primitives only
+            // but I'm not sure how to do it using lock-free primitives only. Considered
+            // using condvars, but didn't like having to Arc<Mutex>...
 
             let duration = std::time::Duration::from_micros(10);
             std::thread::sleep(duration);
