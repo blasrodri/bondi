@@ -1,0 +1,9 @@
+[package]
+authors = ["Blas Rodriguez Irizar <rodrigblas@gmail.com>"]
+edition = "2018"
+name = "bondi"
+version = "0.1.0"
+
+[dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
