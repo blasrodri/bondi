@@ -1,4 +1,4 @@
-//! # Bondi - A a ring of a single producer and multiple consumers
+//! # Bondi
 //!
 //! This is built to provide an inter-process mechanism to communicate
 //! between different parties.
