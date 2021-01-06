@@ -7,6 +7,7 @@ use std::{
 use crate::errors::BondiError;
 
 const MAX_CONSUMERS: usize = 100;
+#[derive(Debug)]
 pub struct Ring<T> {
     capacity: usize,
     buffer: Vec<T>,
@@ -15,7 +16,7 @@ pub struct Ring<T> {
     num_consumers: AtomicUsize,
 }
 
-impl<T: Clone> Ring<T> {
+impl<T: Clone + std::fmt::Debug> Ring<T> {
     pub fn new(capacity: usize) -> Self {
         Ring {
             capacity,
@@ -34,8 +35,20 @@ impl<T: Clone> Ring<T> {
         Ok(num_consumers)
     }
 
+    pub fn get_slowest_reader(&self) -> Result<usize> {
+        if self.num_consumers.load(Ordering::SeqCst) == 0 {
+            return Err(BondiError::NoReaderAvailable.into());
+        }
+        Ok(*self
+            .consumer_idx
+            .iter()
+            .take(self.num_consumers.load(Ordering::SeqCst))
+            .min()
+            .unwrap())
+    }
+
     pub fn insert(&self, item: T) {
-        let writer_idx = self.writer_idx.load(Ordering::SeqCst);
+        let writer_idx = self.writer_idx.load(Ordering::SeqCst) % self.capacity;
         unsafe {
             let buff = (self.buffer.as_ptr()).offset(writer_idx as isize) as _;
             ptr::write(buff, item);
@@ -57,8 +70,7 @@ impl<T: Clone> Ring<T> {
         }
         unsafe {
             let buff = (self.buffer.as_ptr()).offset((consumer_idx % self.capacity) as isize);
-            let consumer_arr =
-                self.consumer_idx.as_ptr().offset(consumer_idx as isize) as *mut usize;
+            let consumer_arr = self.consumer_idx.as_ptr().offset(idx as isize) as *mut usize;
             consumer_arr.write(consumer_idx + 1);
             ptr::read(buff).clone()
         }
