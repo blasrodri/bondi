@@ -6,6 +6,34 @@
 //! It allows a [Writer](writer::Writer) send a message that can be read
 //! by multiple [Reader](reader::Reader) s concurrently. The role of `Bondi` is to sync these operations,
 //! while keeping things **fast**.
+//!
+//! ### A Simple example
+//! ```
+//! // initialize a writer and two readers
+//! // send 100 `Message`s, and receive them from different threads
+//! struct Message(usize)
+//!
+//! fn main() {
+//!     let bondi = Bondi::<Message>::new(100);
+//!     let reader = bondi.get_rx().unwrap();
+//!     let reader2 = bondi.get_rx().unwrap();
+//!
+//!     std::thread::spawn(move || {
+//!         for i in 0..100 {
+//!             writer.write(Message(i));
+//!         }
+//!     });
+//!
+//!     std::thread::spawn(move || {
+//!         let _ = reader.read();
+//!     });
+//!
+//!     std::thread::spawn(move || {
+//!         let _ = reader2.read();
+//!     }).join().unwrap();
+//! }
+//! ```
+
 pub mod errors;
 pub mod reader;
 pub mod ring;
