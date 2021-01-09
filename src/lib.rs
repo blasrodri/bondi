@@ -15,6 +15,7 @@
 //!
 //! fn main() {
 //!     let bondi = Bondi::<Message>::new(100);
+//!     let writer = bondi.get_tx().unwrap();
 //!     let reader = bondi.get_rx().unwrap();
 //!     let reader2 = bondi.get_rx().unwrap();
 //!
@@ -25,11 +26,15 @@
 //!     });
 //!
 //!     std::thread::spawn(move || {
-//!         let _ = reader.read();
+//!         for i in 0..100 {
+//!             reader.read().unwrap();
+//!         }
 //!     });
 //!
 //!     std::thread::spawn(move || {
-//!         let _ = reader2.read();
+//!         for i in 0..100 {
+//!             reader2.read().unwrap();
+//!         }
 //!     }).join().unwrap();
 //! }
 //! ```

@@ -13,6 +13,7 @@ Note: this is an experimental project. Expect things to break, and change.
 
     fn main() {
         let bondi = Bondi::<Message>::new(100);
+        let writer = bondi.get_tx().unwrap();
         let reader = bondi.get_rx().unwrap();
         let reader2 = bondi.get_rx().unwrap();
 
