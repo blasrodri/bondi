@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/blasrodri/bondi"
 description = "Single producer, multi consumer lock-free ring buffer (experimental)"
 documentation = "https://docs.rs/bondi/"
-categories = ["lock-free", "spmc", "ring-buffer", "concurrency"]
+categories = ["spmc", "concurrency"]
 keywords = ["io", "lock-free", "non-blocking"]
 
 
