@@ -76,24 +76,88 @@ mod tests {
             writer.write(i);
         }
     }
+
     #[test]
-    fn write_and_read_something() {
+    fn write_and_read_something_one_reader_no_wrap() {
         let bondi = Bondi::<usize>::new(100);
         let mut writer = bondi.get_tx().unwrap();
-        let reader = dbg!(bondi.get_rx().unwrap());
-        let reader2 = bondi.get_rx().unwrap();
-        for i in 0..100 {
-            writer.write(i);
-            assert_eq!(reader.read(), i);
-        }
-
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        let reader = bondi.get_rx().unwrap();
         std::thread::spawn(move || {
             for i in 0..100 {
-                dbg!(reader2.read(), i);
+                writer.write(i);
+            }
+        });
+
+        std::thread::spawn(move || {
+            for i in 0..100 {
+                assert_eq!(reader.read(), i);
             }
         })
         .join()
         .unwrap();
+    }
+
+    #[test]
+    fn write_and_read_something_two_readers_no_wrap() {
+        let bondi = Bondi::<usize>::new(100);
+        let mut writer = bondi.get_tx().unwrap();
+        let reader = bondi.get_rx().unwrap();
+        let reader2 = bondi.get_rx().unwrap();
+
+        std::thread::spawn(move || {
+            for i in 0..100 {
+                writer.write(i);
+                assert_eq!(reader.read(), i);
+            }
+        });
+
+        std::thread::spawn(move || {
+            for i in 0..100 {
+                assert_eq!(reader2.read(), i);
+                // dbg!(i);
+            }
+        })
+        .join()
+        .unwrap();
+    }
+
+    #[test]
+    fn write_and_read_something_many_readers_with_wrapping() {
+        let bondi = Bondi::<usize>::new(100);
+        let mut writer = bondi.get_tx().unwrap();
+        let readers = (0..99).into_iter().map(|_| bondi.get_rx().unwrap());
+        let last_reader = bondi.get_rx().unwrap();
+        std::thread::spawn(move || {
+            for i in 0..200 {
+                writer.write(i);
+            }
+        });
+
+        for reader in readers {
+            std::thread::spawn(move || {
+                for i in 0..200 {
+                    assert_eq!(reader.read(), i);
+                }
+            });
+        }
+
+        std::thread::spawn(move || {
+            for i in 0..200 {
+                assert_eq!(last_reader.read(), i);
+            }
+        })
+        .join()
+        .unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "No reader available")]
+    fn too_many_readers() {
+        let max_readers_available = 1000;
+        let bondi = Bondi::<usize>::new(max_readers_available);
+        let _readers = (0..max_readers_available)
+            .into_iter()
+            .map(|_| bondi.get_rx().unwrap())
+            .collect::<Vec<_>>();
     }
 }
