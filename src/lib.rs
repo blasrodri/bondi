@@ -7,6 +7,11 @@
 //! by multiple [Reader](reader::Reader) s concurrently. The role of `Bondi` is to sync these operations,
 //! while keeping things **fast**.
 //!
+//! It's worth mentioning that the current implementation blocks on slow readers. It may be preffered to
+//! drop slow consumers, when they cannot keep up with the writer's speed. This variant will likely be the
+//! one introduced in the future, to enhance performance. However, this will mean that not every consumer
+//! will _necessarily_ get all messages, but only the fast enough ones.
+//!
 //! ### A Simple example
 //! ```no_run
 //! // initialize a writer and two readers
