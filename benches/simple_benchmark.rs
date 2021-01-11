@@ -3,7 +3,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 
 fn asd() {
     let num_elements = 10_000;
-    let bondi = Bondi::<usize>::new(100);
+    let bondi = Bondi::<usize>::new(1000);
     let writer = bondi.get_tx().unwrap();
     let readers = (0..10).into_iter().map(|_| bondi.get_rx().unwrap());
     std::thread::spawn(move || {
