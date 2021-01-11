@@ -2,12 +2,12 @@
 authors = ["Blas Rodriguez Irizar <rodrigblas@gmail.com>"]
 edition = "2018"
 name = "bondi"
-version = "0.1.1"
+version = "0.1.2"
 license = "MIT"
 repository = "https://github.com/blasrodri/bondi"
 description = "Single producer, multi consumer lock-free ring buffer (experimental)"
 documentation = "https://docs.rs/bondi/"
-categories = ["spmc", "concurrency"]
+categories = ["concurrency"]
 keywords = ["io", "lock-free", "non-blocking"]
 
 
