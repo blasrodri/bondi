@@ -8,13 +8,16 @@
 //! while keeping things **fast**.
 //!
 //! ### A Simple example
-//! ```
+//! ```no_run
 //! // initialize a writer and two readers
 //! // send 100 `Message`s, and receive them from different threads
-//! struct Message(usize)
+//! #[derive(Debug, Clone)]
+//! struct Message(usize);
+//!
+//! use bondi::Bondi;
 //!
 //! fn main() {
-//!     let bondi = Bondi::<Message>::new(100);
+//!     let bondi = Bondi::new(100);
 //!     let writer = bondi.get_tx().unwrap();
 //!     let reader = bondi.get_rx().unwrap();
 //!     let reader2 = bondi.get_rx().unwrap();
@@ -27,13 +30,13 @@
 //!
 //!     std::thread::spawn(move || {
 //!         for i in 0..100 {
-//!             reader.read().unwrap();
+//!             reader.read();
 //!         }
 //!     });
 //!
 //!     std::thread::spawn(move || {
 //!         for i in 0..100 {
-//!             reader2.read().unwrap();
+//!             reader2.read();
 //!         }
 //!     }).join().unwrap();
 //! }
@@ -104,7 +107,7 @@ mod tests {
     #[test]
     fn write_something() {
         let bondi = Bondi::<usize>::new(100);
-        let mut writer = bondi.get_tx().unwrap();
+        let writer = bondi.get_tx().unwrap();
         for i in 0..100 {
             writer.write(i);
         }
@@ -113,7 +116,7 @@ mod tests {
     #[test]
     fn write_and_read_something_one_reader_no_wrap() {
         let bondi = Bondi::<usize>::new(100);
-        let mut writer = bondi.get_tx().unwrap();
+        let writer = bondi.get_tx().unwrap();
         let reader = bondi.get_rx().unwrap();
         std::thread::spawn(move || {
             for i in 0..100 {
@@ -133,7 +136,7 @@ mod tests {
     #[test]
     fn write_and_read_something_two_readers_no_wrap() {
         let bondi = Bondi::<usize>::new(100);
-        let mut writer = bondi.get_tx().unwrap();
+        let writer = bondi.get_tx().unwrap();
         let reader = bondi.get_rx().unwrap();
         let reader2 = bondi.get_rx().unwrap();
 
@@ -157,7 +160,7 @@ mod tests {
     #[test]
     fn write_and_read_something_many_readers_with_wrapping() {
         let bondi = Bondi::<usize>::new(100);
-        let mut writer = bondi.get_tx().unwrap();
+        let writer = bondi.get_tx().unwrap();
         let readers = (0..99).into_iter().map(|_| bondi.get_rx().unwrap());
         let last_reader = bondi.get_rx().unwrap();
         std::thread::spawn(move || {

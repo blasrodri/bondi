@@ -8,7 +8,7 @@ impl<T: Clone + std::fmt::Debug> Writer<T> {
     pub fn new(ring: Arc<Ring<T>>) -> Self {
         Self { ring }
     }
-    pub fn write(&mut self, item: T) {
+    pub fn write(&self, item: T) {
         self.ring.insert(item)
     }
 }
